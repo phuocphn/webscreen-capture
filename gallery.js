@@ -13,6 +13,7 @@ const clearBtn = document.getElementById("clearAll");
 let capturesState = [];
 let selectionMode = false;
 let selectedIds = new Set();
+let openMenuPanel = null;
 
 init();
 
@@ -20,6 +21,13 @@ async function init() {
   capturesState = await getCaptures();
   render(capturesState);
   updateSelectionActions();
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".card-menu") && openMenuPanel) {
+      openMenuPanel.hidden = true;
+      openMenuPanel = null;
+    }
+  });
 
   toggleSelectBtn?.addEventListener("click", () => {
     selectionMode = !selectionMode;
@@ -53,12 +61,7 @@ async function init() {
       return;
     }
 
-    capturesState = capturesState.filter((item, index) => !selectedIds.has(getCaptureId(item, index)));
-    await chrome.storage.local.set({ [STORAGE_KEY]: capturesState });
-
-    selectedIds = new Set();
-    updateSelectionActions();
-    render(capturesState);
+    await deleteCapturesByIds(selectedIds);
   });
 
   importBtn?.addEventListener("click", () => {
@@ -124,6 +127,55 @@ function render(captures) {
     const captureId = getCaptureId(item, index);
     const card = document.createElement("article");
     card.className = "card";
+
+    if (!selectionMode) {
+      const menu = document.createElement("div");
+      menu.className = "card-menu";
+
+      const menuButton = document.createElement("button");
+      menuButton.type = "button";
+      menuButton.className = "card-menu-trigger";
+      menuButton.setAttribute("aria-label", "Open item menu");
+      menuButton.textContent = "⋯";
+
+      const menuPanel = document.createElement("div");
+      menuPanel.className = "card-menu-panel";
+      menuPanel.hidden = true;
+
+      const deleteItemBtn = document.createElement("button");
+      deleteItemBtn.type = "button";
+      deleteItemBtn.className = "card-menu-action danger";
+      deleteItemBtn.textContent = "Delete";
+
+      menuButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (openMenuPanel && openMenuPanel !== menuPanel) {
+          openMenuPanel.hidden = true;
+        }
+
+        menuPanel.hidden = !menuPanel.hidden;
+        openMenuPanel = menuPanel.hidden ? null : menuPanel;
+      });
+
+      deleteItemBtn.addEventListener("click", async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const ok = confirm("Delete this capture?");
+        if (!ok) {
+          return;
+        }
+
+        await deleteCapturesByIds(new Set([captureId]));
+      });
+
+      menuPanel.appendChild(deleteItemBtn);
+      menu.appendChild(menuButton);
+      menu.appendChild(menuPanel);
+      card.appendChild(menu);
+    }
 
     if (selectionMode) {
       card.classList.add("selecting");
@@ -191,6 +243,16 @@ function getCaptureId(item, index) {
   }
 
   return `${item.timestamp || "no-time"}|${item.url || "no-url"}|${index}`;
+}
+
+async function deleteCapturesByIds(ids) {
+  capturesState = capturesState.filter((item, index) => !ids.has(getCaptureId(item, index)));
+  await chrome.storage.local.set({ [STORAGE_KEY]: capturesState });
+
+  selectedIds = new Set();
+  openMenuPanel = null;
+  updateSelectionActions();
+  render(capturesState);
 }
 
 function updateSelectionActions() {
