@@ -6,11 +6,13 @@ Capture a selected area from the current tab and save image + metadata locally.
 
 - Hotkey capture: `Command/Ctrl + Shift + L`
 - Drag-to-select overlay on webpage
+- Add custom tags to captures (optional, comma-separated)
 - Saved metadata per capture:
   - URL
   - Title
   - Timestamp
-- Gallery page to view all captures
+  - Tags
+- Gallery page to view all captures with tags
 - Import captures from a JSON file
 - Export saved captures to a JSON file
 
