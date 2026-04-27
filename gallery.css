@@ -164,6 +164,15 @@ main {
   border-bottom: 1px solid var(--line);
 }
 
+.card-image-btn {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
 .meta {
   padding: 10px 12px 12px;
 }
@@ -193,4 +202,117 @@ main {
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
+}
+
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.68);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.viewer[hidden] {
+  display: none;
+}
+
+.viewer-dialog {
+  position: relative;
+  width: min(1120px, 96vw);
+  max-height: 92vh;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.viewer-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.96);
+  font-size: 16px;
+  padding: 0;
+}
+
+.viewer-content {
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 14px 10px;
+  min-height: 360px;
+}
+
+.viewer-nav {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text);
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  font-size: 18px;
+}
+
+.viewer-nav:disabled {
+  opacity: 0.4;
+}
+
+.viewer-figure {
+  margin: 0;
+  max-height: 66vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.viewer-figure img {
+  max-width: 100%;
+  max-height: 64vh;
+  object-fit: contain;
+}
+
+.viewer-meta {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.viewer-meta p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .viewer {
+    padding: 8px;
+  }
+
+  .viewer-content {
+    grid-template-columns: 34px 1fr 34px;
+    gap: 8px;
+    padding: 12px 10px 8px;
+    min-height: 280px;
+  }
+
+  .viewer-nav {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
 }

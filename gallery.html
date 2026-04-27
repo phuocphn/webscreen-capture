@@ -24,6 +24,29 @@
       <section id="grid" class="grid"></section>
     </main>
 
+    <section id="viewerModal" class="viewer" hidden>
+      <div class="viewer-dialog">
+        <button id="viewerClose" type="button" class="viewer-close" aria-label="Close viewer">✕</button>
+
+        <div class="viewer-content">
+          <button id="viewerPrev" type="button" class="viewer-nav" aria-label="Previous image">◀</button>
+
+          <figure class="viewer-figure">
+            <img id="viewerImage" src="" alt="Captured image preview" />
+          </figure>
+
+          <button id="viewerNext" type="button" class="viewer-nav" aria-label="Next image">▶</button>
+        </div>
+
+        <div class="viewer-meta">
+          <p><strong>Title:</strong> <span id="viewerTitle"></span></p>
+          <p><strong>URL:</strong> <a id="viewerUrl" href="#" target="_blank" rel="noreferrer"></a></p>
+          <p><strong>Date:</strong> <span id="viewerDate"></span></p>
+          <div id="viewerTags" class="meta-tags"></div>
+        </div>
+      </div>
+    </section>
+
     <input id="importFile" type="file" accept="application/json,.json" hidden />
 
     <script src="gallery.js"></script>
