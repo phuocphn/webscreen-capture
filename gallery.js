@@ -2,16 +2,64 @@ const STORAGE_KEY = "captures";
 
 const emptyState = document.getElementById("emptyState");
 const grid = document.getElementById("grid");
+const toggleSelectBtn = document.getElementById("toggleSelect");
+const selectAllBtn = document.getElementById("selectAll");
+const deleteSelectedBtn = document.getElementById("deleteSelected");
 const importBtn = document.getElementById("importJson");
 const importFileInput = document.getElementById("importFile");
 const exportBtn = document.getElementById("exportJson");
 const clearBtn = document.getElementById("clearAll");
 
+let capturesState = [];
+let selectionMode = false;
+let selectedIds = new Set();
+
 init();
 
 async function init() {
-  let captures = await getCaptures();
-  render(captures);
+  capturesState = await getCaptures();
+  render(capturesState);
+  updateSelectionActions();
+
+  toggleSelectBtn?.addEventListener("click", () => {
+    selectionMode = !selectionMode;
+    selectedIds = new Set();
+    updateSelectionActions();
+    render(capturesState);
+  });
+
+  selectAllBtn?.addEventListener("click", () => {
+    if (!capturesState.length) {
+      return;
+    }
+
+    if (selectedIds.size === capturesState.length) {
+      selectedIds = new Set();
+    } else {
+      selectedIds = new Set(capturesState.map((item, index) => getCaptureId(item, index)));
+    }
+
+    updateSelectionActions();
+    render(capturesState);
+  });
+
+  deleteSelectedBtn?.addEventListener("click", async () => {
+    if (!selectedIds.size) {
+      return;
+    }
+
+    const ok = confirm(`Delete ${selectedIds.size} selected capture(s)?`);
+    if (!ok) {
+      return;
+    }
+
+    capturesState = capturesState.filter((item, index) => !selectedIds.has(getCaptureId(item, index)));
+    await chrome.storage.local.set({ [STORAGE_KEY]: capturesState });
+
+    selectedIds = new Set();
+    updateSelectionActions();
+    render(capturesState);
+  });
 
   importBtn?.addEventListener("click", () => {
     importFileInput?.click();
@@ -34,9 +82,9 @@ async function init() {
         return;
       }
 
-      captures = dedupeCaptures([...normalized, ...captures]);
-      await chrome.storage.local.set({ [STORAGE_KEY]: captures });
-      render(captures);
+      capturesState = dedupeCaptures([...normalized, ...capturesState]);
+      await chrome.storage.local.set({ [STORAGE_KEY]: capturesState });
+      render(capturesState);
       alert(`Imported ${normalized.length} capture(s).`);
     } catch (error) {
       console.error("Import failed:", error);
@@ -44,13 +92,17 @@ async function init() {
     }
   });
 
-  exportBtn?.addEventListener("click", () => exportCaptures(captures));
+  exportBtn?.addEventListener("click", () => exportCaptures(capturesState));
   clearBtn?.addEventListener("click", async () => {
     const ok = confirm("Delete all captures from local storage?");
     if (!ok) {
       return;
     }
     await chrome.storage.local.set({ [STORAGE_KEY]: [] });
+    capturesState = [];
+    selectedIds = new Set();
+    selectionMode = false;
+    updateSelectionActions();
     render([]);
   });
 }
@@ -68,9 +120,29 @@ function render(captures) {
   grid.innerHTML = "";
   emptyState.style.display = captures.length ? "none" : "block";
 
-  for (const item of captures) {
+  for (const [index, item] of captures.entries()) {
+    const captureId = getCaptureId(item, index);
     const card = document.createElement("article");
     card.className = "card";
+
+    if (selectionMode) {
+      card.classList.add("selecting");
+      const checkbox = document.createElement("input");
+      checkbox.className = "card-check";
+      checkbox.type = "checkbox";
+      checkbox.checked = selectedIds.has(captureId);
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          selectedIds.add(captureId);
+        } else {
+          selectedIds.delete(captureId);
+        }
+        updateSelectionActions();
+        card.classList.toggle("selected", checkbox.checked);
+      });
+      card.appendChild(checkbox);
+      card.classList.toggle("selected", checkbox.checked);
+    }
 
     const image = document.createElement("img");
     image.src = item.image;
@@ -111,6 +183,31 @@ function render(captures) {
     card.appendChild(meta);
     grid.appendChild(card);
   }
+}
+
+function getCaptureId(item, index) {
+  if (item.id) {
+    return String(item.id);
+  }
+
+  return `${item.timestamp || "no-time"}|${item.url || "no-url"}|${index}`;
+}
+
+function updateSelectionActions() {
+  if (!toggleSelectBtn || !selectAllBtn || !deleteSelectedBtn) {
+    return;
+  }
+
+  toggleSelectBtn.textContent = selectionMode ? "Cancel Selection" : "Select Items";
+  selectAllBtn.hidden = !selectionMode;
+  deleteSelectedBtn.hidden = !selectionMode;
+
+  const hasItems = capturesState.length > 0;
+  const selectedCount = selectedIds.size;
+  selectAllBtn.disabled = !hasItems;
+  selectAllBtn.textContent = hasItems && selectedCount === capturesState.length ? "Unselect All" : "Select All";
+  deleteSelectedBtn.disabled = selectedCount === 0;
+  deleteSelectedBtn.textContent = selectedCount > 0 ? `Delete Selected (${selectedCount})` : "Delete Selected";
 }
 
 function formatDate(value) {

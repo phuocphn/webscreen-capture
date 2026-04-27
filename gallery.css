@@ -56,6 +56,11 @@ button.danger {
   background: var(--danger);
 }
 
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 main {
   padding: 16px;
 }
@@ -71,10 +76,28 @@ main {
 }
 
 .card {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
+}
+
+.card.selecting {
+  padding-top: 28px;
+}
+
+.card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.15);
+}
+
+.card-check {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 18px;
+  height: 18px;
 }
 
 .card img {
