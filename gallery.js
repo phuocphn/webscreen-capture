@@ -2,14 +2,47 @@ const STORAGE_KEY = "captures";
 
 const emptyState = document.getElementById("emptyState");
 const grid = document.getElementById("grid");
+const importBtn = document.getElementById("importJson");
+const importFileInput = document.getElementById("importFile");
 const exportBtn = document.getElementById("exportJson");
 const clearBtn = document.getElementById("clearAll");
 
 init();
 
 async function init() {
-  const captures = await getCaptures();
+  let captures = await getCaptures();
   render(captures);
+
+  importBtn?.addEventListener("click", () => {
+    importFileInput?.click();
+  });
+
+  importFileInput?.addEventListener("change", async (event) => {
+    const file = event.target?.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const imported = await readJsonFile(file);
+      const normalized = normalizeImportedCaptures(imported);
+
+      if (!normalized.length) {
+        alert("No valid captures found in the selected JSON file.");
+        return;
+      }
+
+      captures = dedupeCaptures([...normalized, ...captures]);
+      await chrome.storage.local.set({ [STORAGE_KEY]: captures });
+      render(captures);
+      alert(`Imported ${normalized.length} capture(s).`);
+    } catch (error) {
+      console.error("Import failed:", error);
+      alert("Unable to import JSON. Please choose a valid exported file.");
+    }
+  });
 
   exportBtn?.addEventListener("click", () => exportCaptures(captures));
   clearBtn?.addEventListener("click", async () => {
@@ -90,6 +123,54 @@ function exportCaptures(captures) {
   });
 
   setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+function readJsonFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        resolve(JSON.parse(String(reader.result || "[]")));
+      } catch (error) {
+        reject(error);
+      }
+    };
+    reader.onerror = () => reject(reader.error || new Error("Failed to read file"));
+    reader.readAsText(file);
+  });
+}
+
+function normalizeImportedCaptures(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .filter((item) => item && typeof item === "object" && typeof item.image === "string")
+    .map((item) => ({
+      id: item.id || crypto.randomUUID(),
+      image: item.image,
+      url: item.url || "",
+      title: item.title || "",
+      timestamp: item.timestamp || new Date().toISOString(),
+      rect: item.rect || null
+    }));
+}
+
+function dedupeCaptures(captures) {
+  const seen = new Set();
+  const result = [];
+
+  for (const item of captures) {
+    const key = item.id || `${item.image}|${item.url}|${item.timestamp}`;
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    result.push(item);
+  }
+
+  return result;
 }
 
 function escapeHtml(text) {

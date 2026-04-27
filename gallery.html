@@ -10,6 +10,7 @@
     <header>
       <h1>Captured Gallery</h1>
       <div class="actions">
+        <button id="importJson" type="button">Import JSON</button>
         <button id="exportJson" type="button">Export JSON</button>
         <button id="clearAll" type="button" class="danger">Clear All</button>
       </div>
@@ -19,6 +20,8 @@
       <p id="emptyState" class="empty">No captures yet. Use the hotkey on any page to create one.</p>
       <section id="grid" class="grid"></section>
     </main>
+
+    <input id="importFile" type="file" accept="application/json,.json" hidden />
 
     <script src="gallery.js"></script>
   </body>
