@@ -7,11 +7,13 @@ Capture a selected area from the current tab and save image + metadata locally.
 - Hotkey capture: `Command/Ctrl + Shift + L`
 - Drag-to-select overlay on webpage
 - Add custom tags to captures (optional, comma-separated)
+- Add a note to each capture (textarea)
 - Saved metadata per capture:
   - URL
   - Title
   - Timestamp
   - Tags
+  - Note
 - Gallery page to view all captures with tags
 - Click a capture to open a zoomed popup with metadata (title, URL, date, tags)
 - Navigate next/previous captures inside the popup
