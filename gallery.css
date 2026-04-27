@@ -56,6 +56,11 @@ button.danger {
   background: var(--danger);
 }
 
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 main {
   padding: 16px;
 }
@@ -71,10 +76,85 @@ main {
 }
 
 .card {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
+}
+
+.card-menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+}
+
+.card-menu-trigger {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.card-menu-panel {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  min-width: 110px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+}
+
+.card-menu-action {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  padding: 8px 10px;
+}
+
+.card-menu-action:hover {
+  background: #f3f5f7;
+}
+
+.card-menu-action.danger {
+  background: transparent;
+  color: var(--danger);
+}
+
+.card-menu-action.danger:hover {
+  background: #fee4e2;
+}
+
+.card.selecting {
+  padding-top: 28px;
+}
+
+.card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.15);
+}
+
+.card-check {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 18px;
+  height: 18px;
 }
 
 .card img {

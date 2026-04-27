@@ -13,6 +13,8 @@ Capture a selected area from the current tab and save image + metadata locally.
   - Timestamp
   - Tags
 - Gallery page to view all captures with tags
+- Delete captures individually via selection
+- Select multiple captures and delete in one action
 - Import captures from a JSON file
 - Export saved captures to a JSON file
 
