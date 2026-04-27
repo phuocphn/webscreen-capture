@@ -87,10 +87,18 @@
       }
     };
 
-    cleanup();
+    // Keep overlay visuals during drag, but hide them before requesting capture.
+    overlay.style.display = "none";
+    selection.style.display = "none";
+    hint.style.display = "none";
+
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        chrome.runtime.sendMessage(payload);
+        setTimeout(() => {
+          chrome.runtime.sendMessage(payload, () => {
+            cleanup();
+          });
+        }, 40);
       });
     });
   }

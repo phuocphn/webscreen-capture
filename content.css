@@ -9,7 +9,7 @@
 .wsc-selection {
   position: fixed;
   border: 2px dashed #ff3b30;
-  background: transparent;
+  background: rgba(255, 59, 48, 0.15);
   pointer-events: none;
   z-index: 2147483647;
 }
