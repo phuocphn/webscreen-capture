@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Captured Gallery</title>
+    <link rel="stylesheet" href="gallery.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Captured Gallery</h1>
+      <div class="actions">
+        <button id="exportJson" type="button">Export JSON</button>
+        <button id="clearAll" type="button" class="danger">Clear All</button>
+      </div>
+    </header>
+
+    <main>
+      <p id="emptyState" class="empty">No captures yet. Use the hotkey on any page to create one.</p>
+      <section id="grid" class="grid"></section>
+    </main>
+
+    <script src="gallery.js"></script>
+  </body>
+</html>

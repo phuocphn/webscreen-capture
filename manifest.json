@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Webscreen Capture",
+  "version": "1.0.0",
+  "description": "Capture a selected portion of the current page and save it with metadata.",
+  "permissions": ["storage", "activeTab", "scripting", "downloads"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "capture-area": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
+      },
+      "description": "Capture selected area"
+    }
+  },
+  "action": {
+    "default_title": "Webscreen Capture",
+    "default_popup": "popup.html"
+  }
+}
