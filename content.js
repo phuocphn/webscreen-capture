@@ -87,8 +87,11 @@
       }
     };
 
-    chrome.runtime.sendMessage(payload, () => {
-      cleanup();
+    cleanup();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        chrome.runtime.sendMessage(payload);
+      });
     });
   }
 
