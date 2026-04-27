@@ -107,6 +107,7 @@ async function saveCapture(message) {
     title: message.metadata.title,
     timestamp: message.metadata.timestamp,
     tags: message.tags || [],
+    note: message.note || "",
     rect: null
   };
 

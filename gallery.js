@@ -14,6 +14,7 @@ const viewerImage = document.getElementById("viewerImage");
 const viewerTitle = document.getElementById("viewerTitle");
 const viewerUrl = document.getElementById("viewerUrl");
 const viewerDate = document.getElementById("viewerDate");
+const viewerNote = document.getElementById("viewerNote");
 const viewerTags = document.getElementById("viewerTags");
 const viewerPrev = document.getElementById("viewerPrev");
 const viewerNext = document.getElementById("viewerNext");
@@ -265,6 +266,13 @@ function render(captures) {
     meta.appendChild(url);
     meta.appendChild(date);
 
+    if (item.note) {
+      const note = document.createElement("p");
+      note.className = "note";
+      note.innerHTML = `<strong>Note:</strong> ${escapeHtml(item.note)}`;
+      meta.appendChild(note);
+    }
+
     if (item.tags && item.tags.length > 0) {
       const tagsContainer = document.createElement("div");
       tagsContainer.className = "meta-tags";
@@ -347,6 +355,7 @@ function syncViewer() {
     !viewerTitle ||
     !viewerUrl ||
     !viewerDate ||
+    !viewerNote ||
     !viewerTags
   ) {
     return;
@@ -357,6 +366,8 @@ function syncViewer() {
   viewerImage.alt = item.title || "Captured image";
   viewerTitle.textContent = item.title || "(Untitled)";
   viewerDate.textContent = formatDate(item.timestamp);
+  viewerNote.textContent = item.note || "";
+  viewerNote.parentElement.hidden = !item.note;
 
   const safeUrl = item.url || "";
   viewerUrl.textContent = safeUrl || "N/A";
@@ -457,6 +468,7 @@ function normalizeImportedCaptures(value) {
       title: item.title || "",
       timestamp: item.timestamp || new Date().toISOString(),
       tags: Array.isArray(item.tags) ? item.tags : [],
+      note: item.note || "",
       rect: item.rect || null
     }));
 }

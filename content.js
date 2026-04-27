@@ -122,6 +122,11 @@
     input.type = "text";
     input.placeholder = "e.g. chart, diagram, code (comma-separated)";
 
+    const note = document.createElement("textarea");
+    note.className = "wsc-note-input";
+    note.rows = 4;
+    note.placeholder = "Add a short note about this capture...";
+
     const hint = document.createElement("p");
     hint.className = "wsc-tag-hint";
     hint.textContent = "Separate tags with commas";
@@ -150,6 +155,7 @@
         type: "SAVE_CAPTURE",
         image: imageData,
         tags,
+        note: note.value.trim(),
         metadata: {
           url: window.location.href,
           title: document.title,
@@ -168,6 +174,7 @@
 
     dialog.appendChild(title);
     dialog.appendChild(input);
+  dialog.appendChild(note);
     dialog.appendChild(hint);
     dialog.appendChild(actions);
 
