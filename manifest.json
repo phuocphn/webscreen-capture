@@ -20,5 +20,12 @@
   "action": {
     "default_title": "Webscreen Capture",
     "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "extension_icon.png",
+    "32": "extension_icon.png",
+    "48": "extension_icon.png",
+    "128": "extension_icon.png"
   }
+
 }
