@@ -95,12 +95,86 @@
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setTimeout(() => {
-          chrome.runtime.sendMessage(payload, () => {
-            cleanup();
+          chrome.runtime.sendMessage(payload, (response) => {
+            if (response?.ok && response?.image) {
+              showTagModal(response.image);
+            } else {
+              cleanup();
+            }
           });
-        }, 40);
+        }, 150);
       });
     });
+  }
+
+  function showTagModal(imageData) {
+    const modal = document.createElement("div");
+    modal.className = "wsc-tag-modal";
+
+    const dialog = document.createElement("div");
+    dialog.className = "wsc-tag-dialog";
+
+    const title = document.createElement("h2");
+    title.textContent = "Add Tags (optional)";
+
+    const input = document.createElement("input");
+    input.className = "wsc-tag-input";
+    input.type = "text";
+    input.placeholder = "e.g. chart, diagram, code (comma-separated)";
+
+    const hint = document.createElement("p");
+    hint.className = "wsc-tag-hint";
+    hint.textContent = "Separate tags with commas";
+
+    const actions = document.createElement("div");
+    actions.className = "wsc-tag-actions";
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.addEventListener("click", () => {
+      modal.remove();
+      cleanup();
+    });
+
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "primary";
+    saveBtn.textContent = "Save";
+    saveBtn.addEventListener("click", () => {
+      const tagsRaw = input.value.trim();
+      const tags = tagsRaw
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+
+      const payload = {
+        type: "SAVE_CAPTURE",
+        image: imageData,
+        tags,
+        metadata: {
+          url: window.location.href,
+          title: document.title,
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      chrome.runtime.sendMessage(payload, () => {
+        modal.remove();
+        cleanup();
+      });
+    });
+
+    actions.appendChild(cancelBtn);
+    actions.appendChild(saveBtn);
+
+    dialog.appendChild(title);
+    dialog.appendChild(input);
+    dialog.appendChild(hint);
+    dialog.appendChild(actions);
+
+    modal.appendChild(dialog);
+    document.documentElement.appendChild(modal);
+
+    input.focus();
   }
 
   function updateSelection(currentX, currentY) {

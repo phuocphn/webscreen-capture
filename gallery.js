@@ -93,6 +93,20 @@ function render(captures) {
     meta.appendChild(url);
     meta.appendChild(date);
 
+    if (item.tags && item.tags.length > 0) {
+      const tagsContainer = document.createElement("div");
+      tagsContainer.className = "meta-tags";
+
+      for (const tag of item.tags) {
+        const tagElement = document.createElement("span");
+        tagElement.className = "tag";
+        tagElement.textContent = escapeHtml(tag);
+        tagsContainer.appendChild(tagElement);
+      }
+
+      meta.appendChild(tagsContainer);
+    }
+
     card.appendChild(image);
     card.appendChild(meta);
     grid.appendChild(card);
@@ -153,6 +167,7 @@ function normalizeImportedCaptures(value) {
       url: item.url || "",
       title: item.title || "",
       timestamp: item.timestamp || new Date().toISOString(),
+      tags: Array.isArray(item.tags) ? item.tags : [],
       rect: item.rect || null
     }));
 }
