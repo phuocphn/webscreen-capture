@@ -4,7 +4,7 @@ Capture a selected area from the current tab and save image + metadata locally.
 
 ## Features
 
-- Hotkey capture: `Command/Ctrl + Shift + S`
+- Hotkey capture: `Command/Ctrl + Shift + L`
 - Drag-to-select overlay on webpage
 - Saved metadata per capture:
   - URL
