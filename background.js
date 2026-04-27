@@ -22,18 +22,25 @@ chrome.action.onClicked.addListener(async (tab) => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.type !== "CAPTURE_SELECTION") {
-    return;
+  if (message?.type === "CAPTURE_SELECTION") {
+    handleCapture(message, sender)
+      .then((image) => sendResponse({ ok: true, image }))
+      .catch((error) => {
+        console.error("Capture failed:", error);
+        sendResponse({ ok: false, error: String(error) });
+      });
+    return true;
   }
 
-  handleCapture(message, sender)
-    .then(() => sendResponse({ ok: true }))
-    .catch((error) => {
-      console.error("Capture failed:", error);
-      sendResponse({ ok: false, error: String(error) });
-    });
-
-  return true;
+  if (message?.type === "SAVE_CAPTURE") {
+    saveCapture(message)
+      .then(() => sendResponse({ ok: true }))
+      .catch((error) => {
+        console.error("Save failed:", error);
+        sendResponse({ ok: false, error: String(error) });
+      });
+    return true;
+  }
 });
 
 async function injectOverlay(tabId) {
@@ -49,25 +56,14 @@ async function injectOverlay(tabId) {
 }
 
 async function handleCapture(message, sender) {
-  const tabId = sender?.tab?.id;
   const windowId = sender?.tab?.windowId;
-  if (!tabId || windowId == null) {
+  if (windowId == null) {
     throw new Error("Missing tab context");
   }
 
   const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: "png" });
   const croppedDataUrl = await cropDataUrl(dataUrl, message.rect, message.devicePixelRatio);
-
-  const item = {
-    id: crypto.randomUUID(),
-    image: croppedDataUrl,
-    url: message.metadata.url,
-    title: message.metadata.title,
-    timestamp: message.metadata.timestamp,
-    rect: message.rect
-  };
-
-  await saveCapture(item);
+  return croppedDataUrl;
 }
 
 async function cropDataUrl(dataUrl, rect, devicePixelRatio = 1) {
@@ -103,7 +99,17 @@ function blobToDataUrl(blob) {
   });
 }
 
-async function saveCapture(item) {
+async function saveCapture(message) {
+  const item = {
+    id: crypto.randomUUID(),
+    image: message.image,
+    url: message.metadata.url,
+    title: message.metadata.title,
+    timestamp: message.metadata.timestamp,
+    tags: message.tags || [],
+    rect: null
+  };
+
   const result = await chrome.storage.local.get([STORAGE_KEY]);
   const captures = result[STORAGE_KEY] || [];
   captures.unshift(item);
