@@ -65,6 +65,25 @@
   box-sizing: border-box;
 }
 
+.wsc-note-input {
+  width: 100%;
+  min-height: 84px;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font: 13px inherit;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  line-height: 1.4;
+}
+
+.wsc-note-input:focus {
+  outline: none;
+  border-color: #0f766e;
+  box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.1);
+}
+
 .wsc-tag-input:focus {
   outline: none;
   border-color: #0f766e;

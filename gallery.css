@@ -183,6 +183,10 @@ main {
   font-size: 13px;
 }
 
+.meta .note {
+  white-space: pre-wrap;
+}
+
 .meta a {
   color: #0b57d0;
 }
@@ -296,6 +300,14 @@ main {
   margin: 0 0 8px;
   font-size: 13px;
   line-height: 1.45;
+}
+
+#viewerNoteRow[hidden] {
+  display: none;
+}
+
+#viewerNote {
+  white-space: pre-wrap;
 }
 
 @media (max-width: 720px) {
