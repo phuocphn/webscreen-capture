@@ -23,7 +23,7 @@ Capture a selected area from the current tab and save image + metadata locally.
 ## Usage
 
 1. Open any webpage.
-2. Press `Command/Ctrl + Shift + S`.
+2. Press `Command/Ctrl + Shift + L`.
 3. Drag to select an area.
 4. Open extension popup and click **Open Gallery**.
 
