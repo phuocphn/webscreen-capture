@@ -9,11 +9,21 @@ const importBtn = document.getElementById("importJson");
 const importFileInput = document.getElementById("importFile");
 const exportBtn = document.getElementById("exportJson");
 const clearBtn = document.getElementById("clearAll");
+const viewerModal = document.getElementById("viewerModal");
+const viewerImage = document.getElementById("viewerImage");
+const viewerTitle = document.getElementById("viewerTitle");
+const viewerUrl = document.getElementById("viewerUrl");
+const viewerDate = document.getElementById("viewerDate");
+const viewerTags = document.getElementById("viewerTags");
+const viewerPrev = document.getElementById("viewerPrev");
+const viewerNext = document.getElementById("viewerNext");
+const viewerClose = document.getElementById("viewerClose");
 
 let capturesState = [];
 let selectionMode = false;
 let selectedIds = new Set();
 let openMenuPanel = null;
+let viewerIndex = -1;
 
 init();
 
@@ -26,6 +36,30 @@ async function init() {
     if (!event.target.closest(".card-menu") && openMenuPanel) {
       openMenuPanel.hidden = true;
       openMenuPanel = null;
+    }
+  });
+
+  viewerModal?.addEventListener("click", (event) => {
+    if (event.target === viewerModal) {
+      closeViewer();
+    }
+  });
+
+  viewerClose?.addEventListener("click", () => closeViewer());
+  viewerPrev?.addEventListener("click", () => moveViewer(-1));
+  viewerNext?.addEventListener("click", () => moveViewer(1));
+
+  document.addEventListener("keydown", (event) => {
+    if (!viewerModal || viewerModal.hidden) {
+      return;
+    }
+
+    if (event.key === "Escape") {
+      closeViewer();
+    } else if (event.key === "ArrowLeft") {
+      moveViewer(-1);
+    } else if (event.key === "ArrowRight") {
+      moveViewer(1);
     }
   });
 
@@ -105,6 +139,7 @@ async function init() {
     capturesState = [];
     selectedIds = new Set();
     selectionMode = false;
+    closeViewer();
     updateSelectionActions();
     render([]);
   });
@@ -200,6 +235,19 @@ function render(captures) {
     image.src = item.image;
     image.alt = item.title || "Captured image";
 
+    const imageButton = document.createElement("button");
+    imageButton.type = "button";
+    imageButton.className = "card-image-btn";
+    imageButton.setAttribute("aria-label", "View larger image");
+    imageButton.addEventListener("click", () => {
+      if (selectionMode) {
+        return;
+      }
+
+      openViewer(index);
+    });
+    imageButton.appendChild(image);
+
     const meta = document.createElement("div");
     meta.className = "meta";
 
@@ -231,7 +279,7 @@ function render(captures) {
       meta.appendChild(tagsContainer);
     }
 
-    card.appendChild(image);
+    card.appendChild(imageButton);
     card.appendChild(meta);
     grid.appendChild(card);
   }
@@ -251,8 +299,90 @@ async function deleteCapturesByIds(ids) {
 
   selectedIds = new Set();
   openMenuPanel = null;
+  closeViewer();
   updateSelectionActions();
   render(capturesState);
+}
+
+function openViewer(index) {
+  if (!viewerModal || !capturesState.length) {
+    return;
+  }
+
+  viewerIndex = Math.max(0, Math.min(index, capturesState.length - 1));
+  syncViewer();
+  viewerModal.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeViewer() {
+  if (!viewerModal || viewerModal.hidden) {
+    return;
+  }
+
+  viewerModal.hidden = true;
+  viewerIndex = -1;
+  document.body.style.overflow = "";
+}
+
+function moveViewer(offset) {
+  if (viewerIndex < 0) {
+    return;
+  }
+
+  const nextIndex = viewerIndex + offset;
+  if (nextIndex < 0 || nextIndex >= capturesState.length) {
+    return;
+  }
+
+  viewerIndex = nextIndex;
+  syncViewer();
+}
+
+function syncViewer() {
+  if (
+    viewerIndex < 0 ||
+    viewerIndex >= capturesState.length ||
+    !viewerImage ||
+    !viewerTitle ||
+    !viewerUrl ||
+    !viewerDate ||
+    !viewerTags
+  ) {
+    return;
+  }
+
+  const item = capturesState[viewerIndex];
+  viewerImage.src = item.image || "";
+  viewerImage.alt = item.title || "Captured image";
+  viewerTitle.textContent = item.title || "(Untitled)";
+  viewerDate.textContent = formatDate(item.timestamp);
+
+  const safeUrl = item.url || "";
+  viewerUrl.textContent = safeUrl || "N/A";
+  if (safeUrl) {
+    viewerUrl.href = safeUrl;
+  } else {
+    viewerUrl.removeAttribute("href");
+  }
+
+  viewerTags.innerHTML = "";
+  if (item.tags && item.tags.length > 0) {
+    for (const tag of item.tags) {
+      const tagElement = document.createElement("span");
+      tagElement.className = "tag";
+      tagElement.textContent = tag;
+      viewerTags.appendChild(tagElement);
+    }
+  }
+
+  if (viewerPrev) {
+    viewerPrev.disabled = viewerIndex === 0;
+  }
+
+  if (viewerNext) {
+    viewerNext.disabled = viewerIndex === capturesState.length - 1;
+  }
 }
 
 function updateSelectionActions() {
