@@ -11,6 +11,7 @@ Capture a selected area from the current tab and save image + metadata locally.
   - Title
   - Timestamp
 - Gallery page to view all captures
+- Import captures from a JSON file
 - Export saved captures to a JSON file
 
 ## Install (Developer Mode)
