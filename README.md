@@ -43,3 +43,16 @@ Capture a selected area from the current tab and save image + metadata locally.
 - `content.js` + `content.css` - Selection overlay UI and interaction
 - `popup.html` / `popup.js` / `popup.css` - Quick controls
 - `gallery.html` / `gallery.js` / `gallery.css` - Saved capture browsing and export
+
+## Where All Files Stored ?
+Navigate to ``chrome://version/`` and look for **Profile Path**, it is your default directory and Extensions Folder is where all the extensions, apps, themes are stored. (If you have several browser profiles set up in Chrome, you will want to view the chrome://version/ page from the profile where the extension is installed.)
+
+Then you can find all files are stored at: ``Profile Path  + /Local Extension Settings/ + <random-id>/``
+
+The `<random-id>` is the one you find when you open the extension gallery. For example:
+
+```bash
+chrome-extension://mccbmalklihbiklicaoiokgflalkcmpg/gallery.html
+```
+
+then `<random-id>=mccbmalklihbiklicaoiokgflalkcmpg`.
